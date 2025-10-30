@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Painel Penal • CPX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo-box">
+      <div class="logo-circle">CPX</div>
+      <div>
+        <h1>Calculadora / Relatório Penal</h1>
+        <p>Complexo RJ • painel operacional</p>
+      </div>
+    </div>
+    <div class="top-info">
+      <div class="top-card">
+        <span>Data</span>
+        <strong id="hoje"></strong>
+      </div>
+      <div class="top-card">
+        <span>Artigos</span>
+        <strong id="cont-crimes">0</strong>
+      </div>
+      <div class="top-card">
+        <span>Pena</span>
+        <strong id="pena-mini">0m</strong>
+      </div>
+      <button id="btn-exportar" class="btn-primary">Enviar para Discord</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ESQUERDA -->
+    <section class="col-left">
+      <!-- bloco 1 -->
+      <div class="panel">
+        <h2>Dados do detento</h2>
+        <div class="form-grid">
+          <div class="field">
+            <label>Nome do detento</label>
+            <input type="text" id="detento_nome" placeholder="Ex: Gabriel Matos">
+          </div>
+          <div class="field">
+            <label>ID</label>
+            <input type="number" id="detento_id" placeholder="152">
+          </div>
+          <div class="field">
+            <label>Advogado</label>
+            <input type="text" id="advogado" placeholder="Nome ou ID">
+          </div>
+        </div>
+      </div>
+
+      <!-- bloco 2: oficiais -->
+      <div class="panel">
+        <div class="panel-head-inline">
+          <h2>Oficiais presentes</h2>
+          <button id="btn-atualizar-oficiais" class="btn-soft">Atualizar lista</button>
+        </div>
+        <p class="hint">Esses nomes vêm da API do teu bot de Discord.</p>
+        <div class="oficiais-grid">
+          <div class="field">
+            <label>Oficial 1</label>
+            <select id="oficial_1" class="oficial-select">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Oficial 2</label>
+            <select id="oficial_2" class="oficial-select">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Oficial 3</label>
+            <select id="oficial_3" class="oficial-select">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Oficial 4</label>
+            <select id="oficial_4" class="oficial-select">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Oficial 5</label>
+            <select id="oficial_5" class="oficial-select">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Oficial 6</label>
+            <select id="oficial_6" class="oficial-select">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Oficial 7</label>
+            <select id="oficial_7" class="oficial-select">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Oficial 8</label>
+            <select id="oficial_8" class="oficial-select">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- bloco 3: itens / dinheiro -->
+      <div class="panel">
+        <h2>Itens / Apreensões</h2>
+        <div class="apreensao-row">
+          <div class="apreensao-left">
+            <textarea id="itens" rows="3" placeholder="Armas, drogas, rádio, dinheiro..."></textarea>
+          </div>
+          <div class="apreensao-right">
+            <label>Dinheiro sujo (R$)</label>
+            <input type="number" id="dinheiro" placeholder="30000">
+            <small class="muted-hint">Use apenas números</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- bloco 4: atenuantes -->
+      <div class="panel">
+        <h2>Atenuantes</h2>
+        <div class="tags">
+          <label><input type="checkbox" class="atenuante" data-percent="20"> Advogado (-20%)</label>
+          <label><input type="checkbox" class="atenuante" data-percent="15"> Réu primário (-15%)</label>
+          <label><input type="checkbox" class="atenuante" data-percent="15"> Réu confesso (-15%)</label>
+        </div>
+      </div>
+
+      <!-- bloco 5: observações -->
+      <div class="panel">
+        <h2>Observações</h2>
+        <textarea id="observacoes" rows="4" maxlength="250" placeholder="Ex: indivíduo colaborou parcialmente, foi lido direitos constitucionais..."></textarea>
+      </div>
+    </section>
+
+    <!-- DIREITA -->
+    <section class="col-right">
+      <div class="panel">
+        <div class="panel-head-inline">
+          <h2>Artigos</h2>
+          <input id="busca-artigo" type="text" class="mini-search" placeholder="Buscar...">
+        </div>
+        <div class="tabs" id="tabs"></div>
+        <div class="crime-list" id="crime-list"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Crimes selecionados</h2>
+        <div id="selected" class="selected"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Totais</h2>
+        <div class="totals">
+          <div>
+            <span>Pena (meses)</span>
+            <strong id="pena-total">0</strong>
+          </div>
+          <div>
+            <span>Multa</span>
+            <strong id="multa-total">0</strong>
+          </div>
+          <div>
+            <span>Fiança</span>
+            <strong id="fianca-total">0</strong>
+          </div>
+        </div>
+        <div class="actions-row">
+          <button id="btn-limpar" class="btn-soft-danger">Limpar</button>
+          <button id="btn-testar" class="btn-soft">Ver payload</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>CPX • UI organizada • webhook + API de oficiais</small>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
