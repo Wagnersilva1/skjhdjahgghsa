@@ -170,7 +170,7 @@ function calc(){
   });
   if (red > 50) red = 50;
 
-  // aplica redução
+  // aplica redução.
   let penaFinal = Math.round(pena - pena * (red / 100));
 
   // 👇 LIMITE DE 180 MESES
