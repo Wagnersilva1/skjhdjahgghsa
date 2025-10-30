@@ -1,5 +1,5 @@
 // ========= CONFIG =========
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1433502177162432603/-vMmZyNtdJOurVR-ZoEUv6CIHWuY7gixHLStstKAakdEwYuNLPc-wpzkqG7eLigplLQ7";
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1433568277623210014/rPLafa5ZkMvp0mvRTWk0qzv5JHa0r8YgxkVL7GJGjmcxfisoeVFWxNsU8TPoiB9EdJMw";
 
 // endpoint da API do teu bot (ajusta aqui)
 const API_OFICIAIS_URL = "https://policia.discloud.app/api/oficiais";
