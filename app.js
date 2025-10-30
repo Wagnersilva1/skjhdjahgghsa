@@ -152,17 +152,33 @@ function renderSelecionados(){
 }
 
 // cálculo
+// cálculo
 function calc(){
-  let pena=0, multa=0, fianca=0;
-  selecionados.forEach(item=>{
+  let pena = 0, multa = 0, fianca = 0;
+
+  // soma normal
+  selecionados.forEach(item => {
     pena += item.pena;
     multa += item.multa;
     fianca += item.fianca;
   });
+
+  // atenuantes
   let red = 0;
-  atenuantes.forEach(a=>{ if(a.checked) red += Number(a.dataset.percent); });
-  if(red > 50) red = 50;
-  const penaFinal = Math.round(pena - pena*(red/100));
+  atenuantes.forEach(a => {
+    if (a.checked) red += Number(a.dataset.percent);
+  });
+  if (red > 50) red = 50;
+
+  // aplica redução
+  let penaFinal = Math.round(pena - pena * (red / 100));
+
+  // 👇 LIMITE DE 180 MESES
+  if (penaFinal > 180) {
+    penaFinal = 180;
+  }
+
+  // atualiza na tela
   document.getElementById("pena-total").textContent = penaFinal;
   document.getElementById("multa-total").textContent = multa.toLocaleString('pt-BR');
   document.getElementById("fianca-total").textContent = fianca.toLocaleString('pt-BR');
