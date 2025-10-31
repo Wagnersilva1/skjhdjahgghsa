@@ -7,30 +7,32 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="logo-box">
-      <div class="logo-circle">CPX</div>
-      <div>
-        <h1>Calculadora / Relatório Penal</h1>
-        <p>Complexo RJ • painel operacional</p>
-      </div>
+<header class="topbar">
+  <div class="logo-box">
+    <div class="logo-circle">CPX</div>
+    <div>
+      <h1>Polícia Complexo RJ</h1>
+      <p>Calculadora de Ocorrências</p>
     </div>
-    <div class="top-info">
-      <div class="top-card">
-        <span>Data</span>
-        <strong id="hoje"></strong>
-      </div>
-      <div class="top-card">
-        <span>Artigos</span>
-        <strong id="cont-crimes">0</strong>
-      </div>
-      <div class="top-card">
-        <span>Pena</span>
-        <strong id="pena-mini">0m</strong>
-      </div>
-      <button id="btn-exportar" class="btn-primary">Enviar para Discord</button>
+  </div>
+
+  <div class="top-info">
+    <div class="top-card">
+      <span>Ocorrências</span>
+      <strong id="totalOcorrencias">0</strong>
     </div>
-  </header>
+  <div class="top-card">
+    <span>Data</span>
+    <strong id="hoje">--/--/----</strong>
+  </div>
+
+
+    <!-- Botão de enviar e check de status -->
+    <button id="btn-exportar" class="btn-primary">Enviar para Discord</button>
+    <span id="status-envio" class="status-envio" style="display:none;">✔ enviado</span>
+  </div>
+</header>
+
 
   <main class="layout">
     <!-- ESQUERDA -->
@@ -186,7 +188,7 @@
   </main>
 
   <footer class="footer">
-    <small>CPX • UI organizada • webhook + API de oficiais</small>
+    <small> Complexo Rj • Calculadora penal © 2025 - </small>
   </footer>
 
   <script src="app.js"></script>
