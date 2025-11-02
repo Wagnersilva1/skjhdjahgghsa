@@ -8,7 +8,7 @@ const API_OFICIAIS_URL = "https://policia.discloud.app/api/oficiais";
 // quando for hospedar junto, pode virar: const API_OFICIAIS_URL = "/api/oficiais";
 
 // =====================================
-// BASE DE ARTIGOS (exemplo)
+// BASE DE ARTIGOS (exemplo) - a sua inteira
 // =====================================
 const ARTIGOS = [
   {
@@ -137,7 +137,6 @@ const ARTIGOS = [
   }
 ];
 
-
 // =====================================
 // ELEMENTOS DO DOM
 // =====================================
@@ -261,7 +260,7 @@ function calc() {
     penaFinal = 180;
   }
 
-  // pega elementos (pra não quebrar se faltar algum no HTML)
+  // atualiza DOM se existir
   const penaTotalEl   = document.getElementById("pena-total");
   const multaTotalEl  = document.getElementById("multa-total");
   const fiancaTotalEl = document.getElementById("fianca-total");
@@ -274,7 +273,7 @@ function calc() {
 }
 
 // =====================================
-// BUSCA
+// BUSCA DE ARTIGOS
 // =====================================
 const buscaArtigo = document.getElementById("busca-artigo");
 if (buscaArtigo) {
@@ -316,7 +315,7 @@ if (btnLimpar) {
 }
 
 // =====================================
-// MONTAR EMBED (COM MENÇÃO)
+// MONTAR EMBED
 // =====================================
 function montarEmbed() {
   const detento = (document.getElementById("detento_nome")?.value) || "Não informado";
@@ -396,7 +395,7 @@ function montarEmbed() {
 }
 
 // =====================================
-// ENVIAR PARA DISCORD (SEM ALERT, COM BADGE)
+// ENVIAR PARA DISCORD
 // =====================================
 if (btnExportar) {
   btnExportar.addEventListener("click", async () => {
@@ -419,12 +418,16 @@ if (btnExportar) {
       });
 
       if (res.ok) {
+        // sucesso visual
         if (statusEnvio) {
           statusEnvio.textContent = "✔ enviado";
           statusEnvio.style.background = "rgba(34,197,94,.12)";
           statusEnvio.style.borderColor = "rgba(34,197,94,.4)";
           statusEnvio.style.color = "#bbf7d0";
         }
+
+        // ✅ LIMPAR PAINEL DEPOIS DO ENVIO
+        limparFormulario();
       } else {
         console.error(await res.text());
         if (statusEnvio) {
@@ -453,6 +456,155 @@ if (btnExportar) {
   });
 }
 
+/* =====================================================
+   FUNÇÃO: limpar todos os campos e selects do painel
+   ===================================================== */
+function limparFormulario() {
+  // limpa todos os inputs e textareas
+  document.querySelectorAll("input, textarea").forEach(el => {
+    if (el.type === "checkbox" || el.type === "radio") {
+      el.checked = false;
+    } else {
+      el.value = "";
+    }
+  });
+
+  // limpa selects comuns
+  document.querySelectorAll("select").forEach(select => {
+    select.selectedIndex = 0;
+  });
+
+  // limpa selects customizados (searchable)
+  document.querySelectorAll(".searchable-display span").forEach(span => {
+    span.textContent = "Selecione...";
+  });
+
+  document.querySelectorAll(".searchable-input").forEach(inp => {
+    inp.value = "";
+  });
+
+  // limpa badges de crimes / itens selecionados se existirem
+  const selecionados = document.querySelectorAll(".selected");
+  selecionados.forEach(sel => (sel.innerHTML = ""));
+
+  // limpa totais se existirem
+  const totalPena = document.getElementById("totalPena");
+  const totalMulta = document.getElementById("totalMulta");
+  const totalFiança = document.getElementById("totalFianca");
+  if (totalPena) totalPena.textContent = "0";
+  if (totalMulta) totalMulta.textContent = "0";
+  if (totalFiança) totalFiança.textContent = "0";
+}
+
+
+// =====================================
+// DATA NO TOPO
+// =====================================
+const hoje = new Date();
+const hojeEl = document.getElementById("hoje");
+if (hojeEl) {
+  hojeEl.textContent = hoje.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+
+// =====================================
+// FUNÇÃO: transformar select em select com PESQUISA
+// =====================================
+function makeSelectSearchable(selectEl) {
+  // pega opções originais (depois que a API já preencheu)
+  const options = Array.from(selectEl.options);
+
+  // wrapper
+  const wrapper = document.createElement('div');
+  wrapper.className = 'searchable-select';
+
+  // display
+  const display = document.createElement('div');
+  display.className = 'searchable-display';
+  const displayText = document.createElement('span');
+  displayText.textContent = selectEl.value
+    ? selectEl.selectedOptions[0].textContent
+    : (options[0] ? options[0].textContent : 'Selecione...');
+  const arrow = document.createElement('span');
+  arrow.className = 'searchable-arrow';
+  arrow.textContent = '▾';
+  display.appendChild(displayText);
+  display.appendChild(arrow);
+
+  // dropdown
+  const dropdown = document.createElement('div');
+  dropdown.className = 'searchable-dropdown';
+
+  // input de busca
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'searchable-input';
+  input.placeholder = 'Digite para filtrar...';
+
+  // lista de opções
+  const list = document.createElement('div');
+  list.className = 'searchable-options';
+
+  options.forEach(opt => {
+    const item = document.createElement('div');
+    item.className = 'searchable-option';
+    item.textContent = opt.textContent;
+    item.dataset.value = opt.value;
+
+    item.addEventListener('click', () => {
+      displayText.textContent = opt.textContent;
+      selectEl.value = opt.value;
+      dropdown.classList.remove('open');
+    });
+
+    list.appendChild(item);
+  });
+
+  dropdown.appendChild(input);
+  dropdown.appendChild(list);
+
+  wrapper.appendChild(display);
+  wrapper.appendChild(dropdown);
+
+  // insere antes do select
+  selectEl.parentNode.insertBefore(wrapper, selectEl);
+
+  // abre/fecha
+  display.addEventListener('click', () => {
+    dropdown.classList.toggle('open');
+    input.value = '';
+    // mostrar tudo ao abrir
+    list.querySelectorAll('.searchable-option').forEach(it => it.classList.remove('hidden'));
+    input.focus();
+  });
+
+  // filtrar
+  input.addEventListener('input', () => {
+    const term = input.value.toLowerCase();
+    list.querySelectorAll('.searchable-option').forEach(it => {
+      const text = it.textContent.toLowerCase();
+      if (text.includes(term) || it.dataset.value === '') {
+        it.classList.remove('hidden');
+      } else {
+        it.classList.add('hidden');
+      }
+    });
+  });
+
+  // fechar clicando fora
+  document.addEventListener('click', (e) => {
+    if (!wrapper.contains(e.target)) {
+      dropdown.classList.remove('open');
+    }
+  });
+
+  // esconde o select original
+  selectEl.style.display = 'none';
+}
+
 // =====================================
 // BUSCAR OFICIAIS DA API
 // =====================================
@@ -469,7 +621,7 @@ async function carregarOficiais() {
       return;
     }
     oficiaisCache = data.oficiais;
-    preencherSelectsOficiais();
+    preencherSelectsOficiais();  // ao preencher, já recria o select com busca
   } catch (e) {
     console.warn("Erro ao buscar oficiais:", e);
   }
@@ -478,35 +630,34 @@ async function carregarOficiais() {
 // coloca os nomes nos <select>
 function preencherSelectsOficiais() {
   const selects = document.querySelectorAll(".oficial-select");
+
   selects.forEach(sel => {
+    // se já existe um select custom imediatamente antes, remove pra recriar
+    const prev = sel.previousElementSibling;
+    if (prev && prev.classList && prev.classList.contains('searchable-select')) {
+      prev.remove();
+    }
+
     const current = sel.value;
     sel.innerHTML = `<option value="">Selecione...</option>`;
+
     oficiaisCache.forEach(o => {
       const opt = document.createElement("option");
-      opt.value = o.nome; // o select mostra o nome
-      opt.textContent = o.nome; // texto preto vem do CSS
+      opt.value = o.nome;     // o select mostra o nome
+      opt.textContent = o.nome;
       sel.appendChild(opt);
     });
+
     if (current) sel.value = current;
+
+    // depois de popular o select original -> criar o custom com busca
+    makeSelectSearchable(sel);
   });
 }
 
 // botão "atualizar lista"
 if (btnAtualizarOficiais) {
   btnAtualizarOficiais.addEventListener("click", carregarOficiais);
-}
-
-// =====================================
-// DATA NO TOPO
-// =====================================
-const hoje = new Date();
-const hojeEl = document.getElementById("hoje");
-if (hojeEl) {
-  hojeEl.textContent = hoje.toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  });
 }
 
 // =====================================
