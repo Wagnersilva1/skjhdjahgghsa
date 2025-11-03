@@ -238,7 +238,6 @@ function renderSelecionados() {
 function calc() {
   let pena = 0, multa = 0, fianca = 0;
 
-  // soma normal
   selecionados.forEach(item => {
     pena += item.pena;
     multa += item.multa;
@@ -250,12 +249,10 @@ function calc() {
   atenuantes.forEach(a => {
     if (a.checked) red += Number(a.dataset.percent);
   });
-  if (red > 50) red = 50; // máximo 50%
+  if (red > 50) red = 50;
 
-  // aplica redução
   let penaFinal = Math.round(pena - pena * (red / 100));
 
-  // LIMITE DE 180 MESES
   if (penaFinal > 180) {
     penaFinal = 180;
   }
@@ -286,7 +283,10 @@ atenuantes.forEach(a => a.addEventListener("change", calc));
 // LIMPAR TUDO (painel esquerdo)
 // =====================================
 function limparTudo() {
+  // limpa mapa de crimes
   selecionados.clear();
+
+  // campos de texto
   const det = document.getElementById("detento_nome");
   const detId = document.getElementById("detento_id");
   const adv = document.getElementById("advogado");
@@ -301,9 +301,13 @@ function limparTudo() {
   if (dinheiro) dinheiro.value = "";
   if (obs) obs.value = "";
 
+  // selects de oficiais
   document.querySelectorAll(".oficial-select").forEach(sel => { sel.value = ""; });
+
+  // atenuantes
   atenuantes.forEach(a => a.checked = false);
 
+  // limpa UI
   renderSelecionados();
   calc();
   renderCrimes(document.getElementById("busca-artigo") ? document.getElementById("busca-artigo").value : "");
@@ -339,6 +343,7 @@ function montarEmbed() {
   });
   const oficiaisStr = oficiaisSel.length ? oficiaisSel.join(", ") : "Não informado";
 
+  // crimes
   const crimesLines = [];
   selecionados.forEach(item => {
     crimesLines.push(
@@ -390,29 +395,34 @@ function montarEmbed() {
 }
 
 // =====================================
-// ENVIAR PARA DISCORD (com validação de nome e ID)
+// ENVIAR PARA DISCORD (com validação e limpeza)
 // =====================================
 if (btnExportar) {
   btnExportar.addEventListener("click", async () => {
-    // ✅ validação antes de montar o payload
     const detentoNome = document.getElementById("detento_nome")?.value.trim();
     const detentoId   = document.getElementById("detento_id")?.value.trim();
 
+    // 🔒 se não tiver nome ou id, mostra msg no painel (NÃO alert)
     if (!detentoNome || !detentoId) {
-      alert("⚠️ Preencha o NOME do detento e o ID do detento antes de enviar para o Discord.");
-      return; // não envia
+      statusEnvio.style.display = "inline-flex";
+      statusEnvio.textContent = "⚠ Preencha o nome do detento e o ID antes de enviar.";
+      statusEnvio.style.background = "rgba(248, 113, 113, .12)";
+      statusEnvio.style.borderColor = "rgba(248, 113, 113, .4)";
+      statusEnvio.style.color = "#fee2e2";
+      setTimeout(() => {
+        statusEnvio.style.display = "none";
+      }, 4000);
+      return;
     }
 
     const payload = montarEmbed();
 
     // status inicial
-    if (statusEnvio) {
-      statusEnvio.style.display = "inline-flex";
-      statusEnvio.textContent = "⏳ enviando...";
-      statusEnvio.style.background = "rgba(59,130,246,.12)";
-      statusEnvio.style.borderColor = "rgba(59,130,246,.4)";
-      statusEnvio.style.color = "#dbeafe";
-    }
+    statusEnvio.style.display = "inline-flex";
+    statusEnvio.textContent = "⏳ enviando...";
+    statusEnvio.style.background = "rgba(59,130,246,.12)";
+    statusEnvio.style.borderColor = "rgba(59,130,246,.4)";
+    statusEnvio.style.color = "#dbeafe";
 
     try {
       const res = await fetch(WEBHOOK_URL, {
@@ -422,75 +432,34 @@ if (btnExportar) {
       });
 
       if (res.ok) {
-        if (statusEnvio) {
-          statusEnvio.textContent = "✔ enviado";
-          statusEnvio.style.background = "rgba(34,197,94,.12)";
-          statusEnvio.style.borderColor = "rgba(34,197,94,.4)";
-          statusEnvio.style.color = "#bbf7d0";
-        }
-        // se quiser limpar tudo após enviar, descomenta:
-        // limparFormulario();
+        // sucesso
+        statusEnvio.textContent = "✔ enviado com sucesso";
+        statusEnvio.style.background = "rgba(34,197,94,.12)";
+        statusEnvio.style.borderColor = "rgba(34,197,94,.4)";
+        statusEnvio.style.color = "#bbf7d0";
+
+        // 🧹 limpa tudo depois do envio
+        limparTudo();
       } else {
         console.error(await res.text());
-        if (statusEnvio) {
-          statusEnvio.textContent = "⚠ erro ao enviar";
-          statusEnvio.style.background = "rgba(248,113,113,.12)";
-          statusEnvio.style.borderColor = "rgba(248,113,113,.4)";
-          statusEnvio.style.color = "#fee2e2";
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      if (statusEnvio) {
-        statusEnvio.textContent = "⚠ erro de conexão";
+        statusEnvio.textContent = "⚠ erro ao enviar";
         statusEnvio.style.background = "rgba(248,113,113,.12)";
         statusEnvio.style.borderColor = "rgba(248,113,113,.4)";
         statusEnvio.style.color = "#fee2e2";
       }
+    } catch (err) {
+      console.error(err);
+      statusEnvio.textContent = "⚠ erro de conexão";
+      statusEnvio.style.background = "rgba(248,113,113,.12)";
+      statusEnvio.style.borderColor = "rgba(248,113,113,.4)";
+      statusEnvio.style.color = "#fee2e2";
     }
 
     // some sozinho depois de 5s
-    if (statusEnvio) {
-      setTimeout(() => {
-        statusEnvio.style.display = "none";
-      }, 5000);
-    }
+    setTimeout(() => {
+      statusEnvio.style.display = "none";
+    }, 5000);
   });
-}
-
-// =====================================
-// LIMPAR FORMULÁRIO COMPLETO (usado no envio, se quiser)
-// =====================================
-function limparFormulario() {
-  document.querySelectorAll("input, textarea").forEach(el => {
-    if (el.type === "checkbox" || el.type === "radio") {
-      el.checked = false;
-    } else {
-      el.value = "";
-    }
-  });
-
-  document.querySelectorAll("select").forEach(select => {
-    select.selectedIndex = 0;
-  });
-
-  document.querySelectorAll(".searchable-display span").forEach(span => {
-    span.textContent = "Selecione...";
-  });
-
-  document.querySelectorAll(".searchable-input").forEach(inp => {
-    inp.value = "";
-  });
-
-  const selecionados = document.querySelectorAll(".selected");
-  selecionados.forEach(sel => (sel.innerHTML = ""));
-
-  const totalPena = document.getElementById("totalPena");
-  const totalMulta = document.getElementById("totalMulta");
-  const totalFiança = document.getElementById("totalFianca");
-  if (totalPena) totalPena.textContent = "0";
-  if (totalMulta) totalMulta.textContent = "0";
-  if (totalFiança) totalFiança.textContent = "0";
 }
 
 // =====================================
