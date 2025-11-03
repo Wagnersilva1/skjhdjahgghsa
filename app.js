@@ -8,7 +8,7 @@ const API_OFICIAIS_URL = "https://policia.discloud.app/api/oficiais";
 // quando for hospedar junto, pode virar: const API_OFICIAIS_URL = "/api/oficiais";
 
 // =====================================
-// BASE DE ARTIGOS (exemplo) - a sua inteira
+// BASE DE ARTIGOS
 // =====================================
 const ARTIGOS = [
   {
@@ -255,12 +255,11 @@ function calc() {
   // aplica redução
   let penaFinal = Math.round(pena - pena * (red / 100));
 
-  // 🔒 LIMITE DE 180 MESES
+  // LIMITE DE 180 MESES
   if (penaFinal > 180) {
     penaFinal = 180;
   }
 
-  // atualiza DOM se existir
   const penaTotalEl   = document.getElementById("pena-total");
   const multaTotalEl  = document.getElementById("multa-total");
   const fiancaTotalEl = document.getElementById("fianca-total");
@@ -284,7 +283,7 @@ if (buscaArtigo) {
 atenuantes.forEach(a => a.addEventListener("change", calc));
 
 // =====================================
-// LIMPAR
+// LIMPAR TUDO (painel esquerdo)
 // =====================================
 function limparTudo() {
   selecionados.clear();
@@ -325,25 +324,21 @@ function montarEmbed() {
   const dinheiro = (document.getElementById("dinheiro")?.value) || "0";
   const obs = (document.getElementById("observacoes")?.value) || "Sem observações.";
 
-  // oficiais selecionados (aqui vamos montar <@id>)
+  // oficiais selecionados
   const oficiaisSel = [];
   document.querySelectorAll(".oficial-select").forEach(sel => {
     const valorSelecionado = sel.value;
     if (valorSelecionado) {
-      // tenta achar no cache pelo nome
       const match = oficiaisCache.find(o => o.nome === valorSelecionado);
       if (match) {
-        // menção real
         oficiaisSel.push(`<@${match.id}>`);
       } else {
-        // fallback: manda só o texto mesmo
         oficiaisSel.push(valorSelecionado);
       }
     }
   });
   const oficiaisStr = oficiaisSel.length ? oficiaisSel.join(", ") : "Não informado";
 
-  // crimes
   const crimesLines = [];
   selecionados.forEach(item => {
     crimesLines.push(
@@ -395,10 +390,19 @@ function montarEmbed() {
 }
 
 // =====================================
-// ENVIAR PARA DISCORD
+// ENVIAR PARA DISCORD (com validação de nome e ID)
 // =====================================
 if (btnExportar) {
   btnExportar.addEventListener("click", async () => {
+    // ✅ validação antes de montar o payload
+    const detentoNome = document.getElementById("detento_nome")?.value.trim();
+    const detentoId   = document.getElementById("detento_id")?.value.trim();
+
+    if (!detentoNome || !detentoId) {
+      alert("⚠️ Preencha o NOME do detento e o ID do detento antes de enviar para o Discord.");
+      return; // não envia
+    }
+
     const payload = montarEmbed();
 
     // status inicial
@@ -418,16 +422,14 @@ if (btnExportar) {
       });
 
       if (res.ok) {
-        // sucesso visual
         if (statusEnvio) {
           statusEnvio.textContent = "✔ enviado";
           statusEnvio.style.background = "rgba(34,197,94,.12)";
           statusEnvio.style.borderColor = "rgba(34,197,94,.4)";
           statusEnvio.style.color = "#bbf7d0";
         }
-
-        // ✅ LIMPAR PAINEL DEPOIS DO ENVIO
-        limparFormulario();
+        // se quiser limpar tudo após enviar, descomenta:
+        // limparFormulario();
       } else {
         console.error(await res.text());
         if (statusEnvio) {
@@ -456,11 +458,10 @@ if (btnExportar) {
   });
 }
 
-/* =====================================================
-   FUNÇÃO: limpar todos os campos e selects do painel
-   ===================================================== */
+// =====================================
+// LIMPAR FORMULÁRIO COMPLETO (usado no envio, se quiser)
+// =====================================
 function limparFormulario() {
-  // limpa todos os inputs e textareas
   document.querySelectorAll("input, textarea").forEach(el => {
     if (el.type === "checkbox" || el.type === "radio") {
       el.checked = false;
@@ -469,12 +470,10 @@ function limparFormulario() {
     }
   });
 
-  // limpa selects comuns
   document.querySelectorAll("select").forEach(select => {
     select.selectedIndex = 0;
   });
 
-  // limpa selects customizados (searchable)
   document.querySelectorAll(".searchable-display span").forEach(span => {
     span.textContent = "Selecione...";
   });
@@ -483,11 +482,9 @@ function limparFormulario() {
     inp.value = "";
   });
 
-  // limpa badges de crimes / itens selecionados se existirem
   const selecionados = document.querySelectorAll(".selected");
   selecionados.forEach(sel => (sel.innerHTML = ""));
 
-  // limpa totais se existirem
   const totalPena = document.getElementById("totalPena");
   const totalMulta = document.getElementById("totalMulta");
   const totalFiança = document.getElementById("totalFianca");
@@ -495,7 +492,6 @@ function limparFormulario() {
   if (totalMulta) totalMulta.textContent = "0";
   if (totalFiança) totalFiança.textContent = "0";
 }
-
 
 // =====================================
 // DATA NO TOPO
@@ -511,17 +507,14 @@ if (hojeEl) {
 }
 
 // =====================================
-// FUNÇÃO: transformar select em select com PESQUISA
+// SELECT COM PESQUISA
 // =====================================
 function makeSelectSearchable(selectEl) {
-  // pega opções originais (depois que a API já preencheu)
   const options = Array.from(selectEl.options);
 
-  // wrapper
   const wrapper = document.createElement('div');
   wrapper.className = 'searchable-select';
 
-  // display
   const display = document.createElement('div');
   display.className = 'searchable-display';
   const displayText = document.createElement('span');
@@ -534,17 +527,14 @@ function makeSelectSearchable(selectEl) {
   display.appendChild(displayText);
   display.appendChild(arrow);
 
-  // dropdown
   const dropdown = document.createElement('div');
   dropdown.className = 'searchable-dropdown';
 
-  // input de busca
   const input = document.createElement('input');
   input.type = 'text';
   input.className = 'searchable-input';
   input.placeholder = 'Digite para filtrar...';
 
-  // lista de opções
   const list = document.createElement('div');
   list.className = 'searchable-options';
 
@@ -569,19 +559,15 @@ function makeSelectSearchable(selectEl) {
   wrapper.appendChild(display);
   wrapper.appendChild(dropdown);
 
-  // insere antes do select
   selectEl.parentNode.insertBefore(wrapper, selectEl);
 
-  // abre/fecha
   display.addEventListener('click', () => {
     dropdown.classList.toggle('open');
     input.value = '';
-    // mostrar tudo ao abrir
     list.querySelectorAll('.searchable-option').forEach(it => it.classList.remove('hidden'));
     input.focus();
   });
 
-  // filtrar
   input.addEventListener('input', () => {
     const term = input.value.toLowerCase();
     list.querySelectorAll('.searchable-option').forEach(it => {
@@ -594,14 +580,12 @@ function makeSelectSearchable(selectEl) {
     });
   });
 
-  // fechar clicando fora
   document.addEventListener('click', (e) => {
     if (!wrapper.contains(e.target)) {
       dropdown.classList.remove('open');
     }
   });
 
-  // esconde o select original
   selectEl.style.display = 'none';
 }
 
@@ -621,18 +605,16 @@ async function carregarOficiais() {
       return;
     }
     oficiaisCache = data.oficiais;
-    preencherSelectsOficiais();  // ao preencher, já recria o select com busca
+    preencherSelectsOficiais();
   } catch (e) {
     console.warn("Erro ao buscar oficiais:", e);
   }
 }
 
-// coloca os nomes nos <select>
 function preencherSelectsOficiais() {
   const selects = document.querySelectorAll(".oficial-select");
 
   selects.forEach(sel => {
-    // se já existe um select custom imediatamente antes, remove pra recriar
     const prev = sel.previousElementSibling;
     if (prev && prev.classList && prev.classList.contains('searchable-select')) {
       prev.remove();
@@ -643,19 +625,17 @@ function preencherSelectsOficiais() {
 
     oficiaisCache.forEach(o => {
       const opt = document.createElement("option");
-      opt.value = o.nome;     // o select mostra o nome
+      opt.value = o.nome;
       opt.textContent = o.nome;
       sel.appendChild(opt);
     });
 
     if (current) sel.value = current;
 
-    // depois de popular o select original -> criar o custom com busca
     makeSelectSearchable(sel);
   });
 }
 
-// botão "atualizar lista"
 if (btnAtualizarOficiais) {
   btnAtualizarOficiais.addEventListener("click", carregarOficiais);
 }
@@ -666,3 +646,11 @@ if (btnAtualizarOficiais) {
 renderCrimes();
 calc();
 carregarOficiais();
+
+if (btnTestar) {
+  btnTestar.addEventListener("click", () => {
+    const payload = montarEmbed();
+    console.log("PAYLOAD QUE VAI PRO DISCORD:", payload);
+    alert("Veja o console do navegador (F12) para ver o payload.");
+  });
+}

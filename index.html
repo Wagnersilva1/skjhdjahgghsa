@@ -38,26 +38,29 @@
     <!-- ESQUERDA -->
     <section class="col-left">
       <!-- bloco 1 -->
-      <div class="panel">
-        <h2>Dados do detento</h2>
-        <div class="form-grid">
-          <div class="field">
-            <label>Nome do detento</label>
-            <input type="text" id="detento_nome" placeholder="Ex: Kakashi chidori">
-          </div>
-          <div class="field">
-            <label>ID</label>
-            <input type="number" id="detento_id" placeholder="152">
-          </div>
-          <div class="field">
-            <label>Advogado</label>
-            <input type="text" id="advogado" placeholder="Nome ou ID">
-          </div>
-        </div>
-      </div>
+ <div class="panel">
+  <h2>Dados do detento</h2>
+  <div class="form-grid">
+    <div class="field">
+      <label>Nome do detento</label>
+      <input type="text" id="detento_nome" placeholder="Ex: Kakashi chidori" required>
+    </div>
+    <div class="field">
+      <label>ID</label>
+      <input type="number" id="detento_id" placeholder="152" required>
+    </div>
+    <div class="field">
+      <label>Advogado</label>
+      <input type="text" id="advogado" placeholder="Nome e ID" required>
+    </div>
+  </div>
+</div>
+
 
       <!-- bloco 2: oficiais -->
-<div class="panel">
+<!-- bloco 2: oficiais -->
+<div class="panel panel-oficiais">
+
   <div class="panel-head-inline">
     <h2>Oficiais presentes</h2>
     <button id="btn-atualizar-oficiais" class="btn-soft">Atualizar lista</button>

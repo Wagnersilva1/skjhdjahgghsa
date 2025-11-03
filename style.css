@@ -29,6 +29,7 @@ body {
   display: flex;
   flex-direction: column;
   line-height: 1.4;
+  overflow-x: hidden;
 }
 
 /* =========================
@@ -43,6 +44,8 @@ body {
   padding: 10px 18px;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
   gap: 10px;
+  position: relative;
+  z-index: 2;
 }
 
 .logo-box {
@@ -69,6 +72,7 @@ body {
   margin: 0;
   font-size: 1rem;
 }
+
 .logo-box p {
   margin: 0;
   font-size: 0.8rem;
@@ -89,11 +93,13 @@ body {
   padding: 6px 12px;
   text-align: center;
 }
+
 .top-card span {
   font-size: 11px;
   color: var(--muted);
   display: block;
 }
+
 .top-card strong {
   font-size: 14px;
 }
@@ -109,6 +115,7 @@ body {
   box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
   transition: 0.15s;
 }
+
 .btn-primary:hover {
   background: linear-gradient(135deg, #38bdf8, #0ea5e9);
 }
@@ -123,6 +130,9 @@ body {
   gap: 14px;
   padding: 14px;
   min-height: 0;
+  position: relative;
+  overflow: visible !important;  /* deixa dropdown sair */
+  z-index: 1;
 }
 
 /* =========================
@@ -136,7 +146,11 @@ body {
   backdrop-filter: blur(14px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
   min-width: 0;
+  position: relative;
+  overflow: visible !important;  /* ESSENCIAL para o menu ficar por cima */
+  z-index: 3;
 }
+
 .panel h2 {
   margin-top: 0;
   font-size: 14px;
@@ -144,6 +158,7 @@ body {
   padding-left: 6px;
   margin-bottom: 8px;
 }
+
 .panel-head-inline {
   display: flex;
   justify-content: space-between;
@@ -184,6 +199,7 @@ select {
   font-size: 13px;
   transition: 0.2s;
 }
+
 input:focus,
 textarea:focus,
 select:focus {
@@ -191,6 +207,7 @@ select:focus {
   background: rgba(255, 255, 255, 0.07);
   outline: none;
 }
+
 textarea {
   resize: vertical;
   min-height: 80px;
@@ -203,7 +220,9 @@ textarea {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
   gap: 8px;
-  margin-bottom: 18px; /* espaço pra não colar nos itens/apreensões */
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 200;   /* fica acima do bloco de itens */
 }
 
 .hint {
@@ -220,15 +239,26 @@ textarea {
   display: flex;
   gap: 12px;
   align-items: stretch;
-  margin-top: 8px; /* puxa um pouco pra baixo */
+  margin-top: 8px;
+  position: relative;
+  z-index: 0;          /* fica ATRÁS do dropdown */
+  pointer-events: auto;
+  overflow: visible;
 }
+
 .apreensao-left {
   flex: 1 1 auto;
+  position: relative;
+  z-index: 0;
 }
+
 .apreensao-left textarea {
   height: 100%;
   min-height: 86px;
+  position: relative;
+  z-index: 0;
 }
+
 .apreensao-right {
   width: 180px;
   background: rgba(15, 23, 42, .25);
@@ -238,18 +268,25 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  position: relative;
+  z-index: 0;
 }
+
 .apreensao-right label {
   font-size: 11px;
   color: rgba(226, 232, 240, .7);
 }
+
 .apreensao-right input {
   background: rgba(15, 23, 42, .5);
   border: 1px solid rgba(148, 163, 184, .2);
   border-radius: 8px;
   padding: 5px 6px;
   font-size: 13px;
+  position: relative;
+  z-index: 0;
 }
+
 .muted-hint {
   font-size: 10.5px;
   color: rgba(148, 163, 184, .7);
@@ -298,6 +335,7 @@ textarea {
   cursor: pointer;
   transition: 0.15s;
 }
+
 .tab.active {
   background: var(--accent-soft);
   border-color: var(--accent);
@@ -322,6 +360,7 @@ textarea {
   max-height: 360px;
   overflow-y: auto;
 }
+
 .crime-item {
   background: rgba(15, 23, 42, 0.3);
   border: 1px solid rgba(148, 163, 184, 0.05);
@@ -331,10 +370,12 @@ textarea {
   cursor: pointer;
   transition: 0.1s;
 }
+
 .crime-item:hover {
   background: rgba(56, 189, 248, 0.15);
   border-color: rgba(56, 189, 248, 0.25);
 }
+
 .crime-meta {
   font-size: 11px;
   color: rgba(226, 232, 240, 0.6);
@@ -349,6 +390,7 @@ textarea {
   flex-wrap: wrap;
   min-height: 26px;
 }
+
 .badge {
   background: linear-gradient(120deg, rgba(15, 23, 42, .2) 0%, rgba(56, 189, 248, .25) 100%);
   border: 1px solid rgba(148, 163, 184, .14);
@@ -359,6 +401,7 @@ textarea {
   gap: 5px;
   align-items: center;
 }
+
 .badge button {
   background: transparent;
   border: none;
@@ -375,6 +418,7 @@ textarea {
   gap: 10px;
   flex-wrap: wrap;
 }
+
 .totals > div {
   background: rgba(15, 23, 42, .35);
   border: 1px solid rgba(148, 163, 184, .1);
@@ -383,10 +427,12 @@ textarea {
   flex: 1 1 120px;
   min-width: 120px;
 }
+
 .totals span {
   font-size: 11px;
   color: var(--muted);
 }
+
 .totals strong {
   font-size: 21px;
   color: #fff;
@@ -401,6 +447,7 @@ textarea {
   margin-top: 10px;
   flex-wrap: wrap;
 }
+
 .btn-soft,
 .btn-soft-danger {
   background: rgba(56, 189, 248, 0.08);
@@ -411,6 +458,7 @@ textarea {
   cursor: pointer;
   font-size: 12.5px;
 }
+
 .btn-soft-danger {
   background: rgba(244, 63, 94, 0.1);
   border: 1px solid rgba(244, 63, 94, .4);
@@ -434,7 +482,7 @@ textarea {
 }
 
 /* =========================
-   FALLBACK SELECT ORIGINAL
+   SELECT ORIGINAL (fallback)
    ========================= */
 .oficial-select,
 .oficial-select option {
@@ -449,6 +497,7 @@ textarea {
 .searchable-select {
   position: relative;
   width: 100%;
+  z-index: 300; /* acima de itens */
 }
 
 .searchable-display {
@@ -462,11 +511,13 @@ textarea {
   align-items: center;
   gap: .5rem;
   min-height: 38px;
+  position: relative;
+  z-index: 350;
 }
 
 .searchable-display span {
   font-size: .85rem;
-  color: #000;   /* forçado pra preto */
+  color: #000;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -477,7 +528,6 @@ textarea {
   color: #999;
 }
 
-/* dropdown do select */
 .searchable-dropdown {
   position: absolute;
   top: calc(100% + 4px);
@@ -486,11 +536,11 @@ textarea {
   background: #fff;
   border: 1px solid rgba(0,0,0,.06);
   border-radius: .6rem;
-  box-shadow: 0 10px 35px rgba(15,23,42,.08);
-  z-index: 50;
+  box-shadow: 0 10px 35px rgba(15,23,42,.18);
+  z-index: 99999 !important;  /* sobrepõe TUDO */
   display: none;
   max-height: 220px;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .searchable-dropdown.open {
@@ -545,6 +595,8 @@ textarea {
   border-top: 1px solid rgba(56, 189, 248, 0.1);
   padding: 10px;
   background: #0b1224;
+  position: relative;
+  z-index: 1;
 }
 
 /* =========================
@@ -561,19 +613,48 @@ textarea {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .apreensao-row {
     flex-direction: column;
   }
+
   .apreensao-right {
     width: 100%;
     flex-direction: row;
     align-items: center;
     gap: 8px;
   }
+
   .apreensao-right input {
     flex: 1;
   }
+
   .muted-hint {
     text-align: right;
   }
+}
+/* painel de OFICIAIS precisa estar acima dos outros da coluna esquerda */
+.panel-oficiais {
+  position: relative;
+  z-index: 50;         /* maior que o panel padrão (3) */
+  overflow: visible;   /* deixa o dropdown sair */
+}
+
+/* o container interno dos selects também não pode cortar */
+.panel-oficiais .oficiais-grid {
+  overflow: visible;
+  position: relative;
+  z-index: 60;
+}
+
+/* garante que o dropdown fique ABSOLUTAMENTE acima */
+.panel-oficiais .searchable-dropdown {
+  z-index: 99999 !important;
+}
+
+/* painel de ITENS pode ficar mais baixo */
+.col-left .panel:nth-of-type(3) {
+  position: relative;
+  z-index: 5;          /* menor que 50 */
+  overflow: visible;
 }
