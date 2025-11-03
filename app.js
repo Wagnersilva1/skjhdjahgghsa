@@ -402,16 +402,28 @@ if (btnExportar) {
     const detentoNome = document.getElementById("detento_nome")?.value.trim();
     const detentoId   = document.getElementById("detento_id")?.value.trim();
 
-    // 🔒 se não tiver nome ou id, mostra msg no painel (NÃO alert)
+    // 🔒 validação 1: nome e id do detento
     if (!detentoNome || !detentoId) {
       statusEnvio.style.display = "inline-flex";
       statusEnvio.textContent = "⚠ Preencha o nome do detento e o ID antes de enviar.";
       statusEnvio.style.background = "rgba(248, 113, 113, .12)";
       statusEnvio.style.borderColor = "rgba(248, 113, 113, .4)";
       statusEnvio.style.color = "#fee2e2";
-      setTimeout(() => {
-        statusEnvio.style.display = "none";
-      }, 4000);
+      setTimeout(() => { statusEnvio.style.display = "none"; }, 4000);
+      return;
+    }
+
+    // 🔒 validação 2: pelo menos 1 oficial selecionado
+    const temOficialSelecionado = Array.from(document.querySelectorAll(".oficial-select"))
+      .some(sel => (sel.value || "").trim() !== "");
+
+    if (!temOficialSelecionado) {
+      statusEnvio.style.display = "inline-flex";
+      statusEnvio.textContent = "⚠ Selecione ao menos 1 oficial antes de enviar.";
+      statusEnvio.style.background = "rgba(248, 113, 113, .12)";
+      statusEnvio.style.borderColor = "rgba(248, 113, 113, .4)";
+      statusEnvio.style.color = "#fee2e2";
+      setTimeout(() => { statusEnvio.style.display = "none"; }, 4000);
       return;
     }
 
@@ -432,14 +444,11 @@ if (btnExportar) {
       });
 
       if (res.ok) {
-        // sucesso
         statusEnvio.textContent = "✔ enviado com sucesso";
         statusEnvio.style.background = "rgba(34,197,94,.12)";
         statusEnvio.style.borderColor = "rgba(34,197,94,.4)";
         statusEnvio.style.color = "#bbf7d0";
-
-        // 🧹 limpa tudo depois do envio
-        limparTudo();
+        limparTudo(); // 🧹 limpa tudo depois do envio
       } else {
         console.error(await res.text());
         statusEnvio.textContent = "⚠ erro ao enviar";
@@ -455,12 +464,12 @@ if (btnExportar) {
       statusEnvio.style.color = "#fee2e2";
     }
 
-    // some sozinho depois de 5s
     setTimeout(() => {
       statusEnvio.style.display = "none";
     }, 5000);
   });
 }
+
 
 // =====================================
 // DATA NO TOPO
