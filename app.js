@@ -1,11 +1,14 @@
 // =====================================
-// CONFIGURAÇÕES
+// CONFIGURAÇÕES (sem segredos no front)
 // =====================================
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1433568277623210014/rPLafa5ZkMvp0mvRTWk0qzv5JHa0r8YgxkVL7GJGjmcxfisoeVFWxNsU8TPoiB9EdJMw";
-
-// enquanto estiver testando com Go Live + bot local:
-const API_OFICIAIS_URL = "https://policia.discloud.app/api/oficiais";
-// quando for hospedar junto, pode virar: const API_OFICIAIS_URL = "/api/oficiais";
+// Agora o front chama apenas endpoints do backend.
+// Se você abrir via outro servidor (ex: Go Live 5500),
+// ele usa automaticamente http://localhost:3000 para a API.
+const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') && location.port !== '3000'
+  ? 'http://localhost:3000'
+  : '';
+const WEBHOOK_ENDPOINT = `${API_BASE}/api/webhook`;
+const API_OFICIAIS_URL = `${API_BASE}/api/oficiais`;
 
 // =====================================
 // BASE DE ARTIGOS
@@ -437,7 +440,7 @@ if (btnExportar) {
     statusEnvio.style.color = "#dbeafe";
 
     try {
-      const res = await fetch(WEBHOOK_URL, {
+      const res = await fetch(WEBHOOK_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
