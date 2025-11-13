@@ -4,9 +4,12 @@
 // Agora o front chama apenas endpoints do backend.
 // Se você abrir via outro servidor (ex: Go Live 5500),
 // ele usa automaticamente http://localhost:3000 para a API.
-const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') && location.port !== '8080'
+let API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') && location.port !== '3000'
   ? 'http://localhost:3000'
   : '';
+if (location.hostname.endsWith('github.io')) {
+  API_BASE = 'https://policia.discloud.app';
+}
 const WEBHOOK_ENDPOINT = `${API_BASE}/api/webhook`;
 const API_OFICIAIS_URL = `${API_BASE}/api/oficiais`;
 
