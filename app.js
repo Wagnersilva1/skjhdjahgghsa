@@ -4,11 +4,9 @@
 // Agora o front chama apenas endpoints do backend.
 // Se você abrir via outro servidor (ex: Go Live 5500),
 // ele usa automaticamente http://localhost:3000 para a API.
-const isLocalHost = ['localhost', '127.0.0.1'].includes(location.hostname);
-// Se estiver em outro servidor local (ex: 5500), usa backend em 3000.
-// Caso contrrio (mesma origem, porta 3000/80 ou sem porta), usa caminho relativo.
-const shouldProxyTo3000 = isLocalHost && !!location.port && location.port !== '3000';
-const API_BASE = shouldProxyTo3000 ? 'http://localhost:3000' : '';
+const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') && location.port !== '8080'
+  ? 'http://localhost:3000'
+  : '';
 const WEBHOOK_ENDPOINT = `${API_BASE}/api/webhook`;
 const API_OFICIAIS_URL = `${API_BASE}/api/oficiais`;
 
@@ -637,3 +635,6 @@ if (btnTestar) {
     alert("Veja o console do navegador (F12) para ver o payload.");
   });
 }
+
+// =====================================
+// (sem fallback para hospedagem estatica; requer backend)
